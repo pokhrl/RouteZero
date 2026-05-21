@@ -1,0 +1,61 @@
+{
+  "nodes": [
+    {
+      "id": "attacker",
+      "type": "network",
+      "label": "Attacker (Internet)"
+    },
+    {
+      "id": "log4shell",
+      "type": "vulnerability",
+      "label": "Log4Shell",
+      "cvss": 10.0,
+      "cve_id": "CVE-2021-44228"
+    },
+    {
+      "id": "app_server",
+      "type": "host",
+      "label": "App Server",
+      "os": "Linux",
+      "services": ["java", "http"]
+    },
+    {
+      "id": "domain_admin",
+      "type": "credential",
+      "label": "Domain Admin Credential",
+      "privilege_level": "high"
+    },
+    {
+      "id": "secrets",
+      "type": "data",
+      "label": "Secrets Store",
+      "sensitivity": "critical"
+    }
+  ],
+  "edges": [
+    {
+      "from": "attacker",
+      "to": "app_server",
+      "edge_type": "network_access",
+      "difficulty": "low"
+    },
+    {
+      "from": "log4shell",
+      "to": "app_server",
+      "edge_type": "exploits",
+      "difficulty": "low"
+    },
+    {
+      "from": "app_server",
+      "to": "domain_admin",
+      "edge_type": "privilege_escalation",
+      "difficulty": "medium"
+    },
+    {
+      "from": "domain_admin",
+      "to": "secrets",
+      "edge_type": "data_access",
+      "difficulty": "low"
+    }
+  ]
+}

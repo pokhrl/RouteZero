@@ -1,0 +1,84 @@
+{
+  "nodes": [
+    {
+      "id": "attacker",
+      "type": "network",
+      "label": "Attacker"
+    },
+    {
+      "id": "workstation",
+      "type": "host",
+      "label": "Employee Workstation",
+      "os": "Windows 10"
+    },
+    {
+      "id": "phishing_cred",
+      "type": "credential",
+      "label": "Phished User Credential",
+      "privilege_level": "low"
+    },
+    {
+      "id": "zerologon",
+      "type": "vulnerability",
+      "label": "Zerologon",
+      "cvss": 10.0,
+      "cve_id": "CVE-2020-1472"
+    },
+    {
+      "id": "dc",
+      "type": "host",
+      "label": "Domain Controller",
+      "os": "Windows Server 2019"
+    },
+    {
+      "id": "da_hash",
+      "type": "credential",
+      "label": "Domain Admin NTLM Hash",
+      "privilege_level": "high"
+    },
+    {
+      "id": "ad_db",
+      "type": "data",
+      "label": "Active Directory Database (NTDS.dit)",
+      "sensitivity": "critical"
+    }
+  ],
+  "edges": [
+    {
+      "from": "attacker",
+      "to": "workstation",
+      "edge_type": "network_access",
+      "difficulty": "low"
+    },
+    {
+      "from": "workstation",
+      "to": "phishing_cred",
+      "edge_type": "credential_use",
+      "difficulty": "low"
+    },
+    {
+      "from": "phishing_cred",
+      "to": "dc",
+      "edge_type": "lateral_movement",
+      "difficulty": "medium"
+    },
+    {
+      "from": "zerologon",
+      "to": "dc",
+      "edge_type": "exploits",
+      "difficulty": "low"
+    },
+    {
+      "from": "dc",
+      "to": "da_hash",
+      "edge_type": "privilege_escalation",
+      "difficulty": "low"
+    },
+    {
+      "from": "da_hash",
+      "to": "ad_db",
+      "edge_type": "data_access",
+      "difficulty": "low"
+    }
+  ]
+}

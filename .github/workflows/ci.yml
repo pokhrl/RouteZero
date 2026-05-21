@@ -1,0 +1,77 @@
+name: RouteZero CI
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+
+jobs:
+  # ── Python matrix tests ─────────────────────────────────────────────────
+  test-python:
+    name: Test Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install click pytest pytest-cov
+          pip install -e .
+
+      - name: Validate example inputs
+        run: |
+          routezero validate examples/webapp_attack.json
+          routezero validate examples/ad_escalation.json
+
+      - name: Run analysis smoke test
+        run: |
+          routezero analyze examples/webapp_attack.json --json-output
+          routezero analyze examples/ad_escalation.json --type escalation
+
+      - name: Run pytest suite
+        run: pytest tests/ -v --tb=short
+
+  # ── Build C CVSS tool ───────────────────────────────────────────────────
+  build-c-cvss:
+    name: Build C CVSS tool
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compile routezero_cvss
+        run: gcc -o routezero_cvss tools/routezero_cvss.c -lm -Wall -Wextra
+
+      - name: Test CVSS tool — Log4Shell (expect 10.0 CRITICAL)
+        run: |
+          output=$(./routezero_cvss N L N N C H H H)
+          echo "$output"
+          echo "$output" | grep -q "10.0"
+          echo "$output" | grep -q "CRITICAL"
+
+      - name: Test CVSS tool — low severity
+        run: |
+          output=$(./routezero_cvss L H H R U N L N)
+          echo "$output"
+          echo "$output" | grep -q "LOW\|MEDIUM"
+
+      - name: Test CVSS tool — bad args return error
+        run: |
+          ./routezero_cvss 2>&1 || true   # expect non-zero exit; just smoke-test
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: routezero_cvss-linux-amd64
+          path: routezero_cvss

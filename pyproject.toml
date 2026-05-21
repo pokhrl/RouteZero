@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "routezero"
+version = "1.0.0"
+description = "Attack-path analysis engine for modeling vulnerability chains and lateral movement"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+keywords = ["security", "penetration-testing", "attack-graph", "vulnerability", "ctf"]
+dependencies = [
+    "click>=8.0",
+]
+
+[project.scripts]
+routezero = "routezero.cli.main:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["routezero*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
