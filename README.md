@@ -1,10 +1,10 @@
-# 🛣️ RouteZero
+# RouteZero
 
 **Attack-path analysis engine for modeling vulnerability chains, privilege escalation, and lateral movement in authorized security research environments.**
 
 RouteZero converts infrastructure and vulnerability data into directed attack graphs, then discovers and ranks realistic attack paths automatically.
 
-> ⚠️ RouteZero is intended strictly for **authorized** security testing, research environments, and CTF use.
+>  RouteZero is intended strictly for **authorized** security testing, research environments, and CTF use.
 
 ---
 
